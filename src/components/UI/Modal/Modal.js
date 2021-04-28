@@ -1,5 +1,5 @@
 import React from "react";
-import Aux from "../../../hoc/Aux";
+import Aux from "../../../hoc/Aux/Aux";
 import Backdrop from "../Backdrop/Backdrop";
 
 import classes from "./Modal.css";
@@ -21,4 +21,7 @@ const modal = (props) => {
   );
 };
 
-export default modal;
+function checkRendering(prevProps, nextProps) {
+  return prevProps.show === nextProps.show;
+}
+export default React.memo(modal, checkRendering);
