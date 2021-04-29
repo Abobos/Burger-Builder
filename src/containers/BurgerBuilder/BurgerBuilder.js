@@ -17,18 +17,18 @@ const INGREDIENTS_PRICES = {
 
 class BurgerBuilder extends Component {
   state = {
-    ingredients: {
-      salad: 0,
-      bacon: 0,
-      cheese: 0,
-      meat: 0,
-    },
-
+    ingredients: null,
     totalPrice: 4,
     purchaseable: false,
     purchasing: false,
     loading: false,
   };
+
+  async componentDidMount() {
+    const response = await axios.get('/ingredients.json');
+    console.log({ response });
+    this.setState({ ingredients: response.data });
+  }
 
   updatePurchaseState = (updatedIngredients) => {
     const ingredients = { ...updatedIngredients };
@@ -89,7 +89,7 @@ class BurgerBuilder extends Component {
       deliveryMethod: 'fastest',
     };
 
-    const response = await axios.post('/order', newOrder);
+    const response = await axios.post('/orders.json', newOrder);
 
     console.log({ response });
 
@@ -120,7 +120,7 @@ class BurgerBuilder extends Component {
         >
           {this.state.loading ? (
             <Spinner />
-          ) : (
+          ) : this.state.ingredients ? (
             <OrderSummary
               ingredients={this.state.ingredients}
               cancel={this.purchaseHandler}
@@ -128,19 +128,24 @@ class BurgerBuilder extends Component {
               totalPrice={this.state.totalPrice}
               loading={this.state.loading}
             />
-          )}
+          ) : null}
         </Modal>
 
-        <Burger ingredients={this.state.ingredients} />
-
-        <BuildControls
-          ingredientAdded={this.addIngredient}
-          ingredientRemoved={this.removeIngredient}
-          disabledProps={disabledInfo}
-          totalPrice={this.state.totalPrice}
-          purchaseable={!this.state.purchaseable}
-          ordered={this.purchaseHandler}
-        />
+        {this.state.ingredients ? (
+          <Aux>
+            (<Burger ingredients={this.state.ingredients} />
+            <BuildControls
+              ingredientAdded={this.addIngredient}
+              ingredientRemoved={this.removeIngredient}
+              disabledProps={disabledInfo}
+              totalPrice={this.state.totalPrice}
+              purchaseable={!this.state.purchaseable}
+              ordered={this.purchaseHandler}
+            />
+          </Aux>
+        ) : (
+          <Spinner />
+        )}
       </Aux>
     );
   }
