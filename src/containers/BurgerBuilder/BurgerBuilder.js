@@ -1,12 +1,12 @@
-import axios from '../../axios-orders';
-import React, { Component } from 'react';
-import BuildControls from '../../components/Burger/BuildControls/BuildControls';
-import Burger from '../../components/Burger/Burger';
-import OrderSummary from '../../components/Burger/OrderSummary/OrderSummary';
-import Modal from '../../components/UI/Modal/Modal';
-import Aux from '../../hoc/Aux/Aux';
-import Spinner from '../../components/UI/Spinner/Spinner';
-import withErrorHandler from '../../hoc/WithErrorHandler/WithErrorHandler';
+import axios from "../../axios-orders";
+import React, { Component } from "react";
+import BuildControls from "../../components/Burger/BuildControls/BuildControls";
+import Burger from "../../components/Burger/Burger";
+import OrderSummary from "../../components/Burger/OrderSummary/OrderSummary";
+import Modal from "../../components/UI/Modal/Modal";
+import Aux from "../../hoc/Aux/Aux";
+import Spinner from "../../components/UI/Spinner/Spinner";
+import withErrorHandler from "../../hoc/WithErrorHandler/WithErrorHandler";
 
 const INGREDIENTS_PRICES = {
   salad: 0.5,
@@ -22,14 +22,16 @@ class BurgerBuilder extends Component {
     purchaseable: false,
     purchasing: false,
     loading: false,
+    error: false,
   };
 
   async componentDidMount() {
     try {
-      const response = await axios.get('/ingredients');
+      const response = await axios.get("/ingredients.json");
       console.log({ response });
       this.setState({ ingredients: response.data });
     } catch (err) {
+      this.setState({ error: true });
       console.log({ err });
     }
   }
@@ -76,34 +78,44 @@ class BurgerBuilder extends Component {
   continuePurchase = async () => {
     this.setState({ loading: true });
 
-    // try {
     const newOrder = {
       ingredients: { ...this.state.ingredients },
       price: this.state.totalPrice,
       customer: {
-        name: 'Blessing Makaraba',
+        name: "Blessing Makaraba",
         address: {
-          street: '10 Ojodu Berger',
-          zipCode: '+234',
-          country: 'Nigeia',
+          street: "10 Ojodu Berger",
+          zipCode: "+234",
+          country: "Nigeia",
         },
-        email: 'blessingmakaraba@gmail.com',
+        email: "blessingmakaraba@gmail.com",
       },
 
-      deliveryMethod: 'fastest',
+      deliveryMethod: "fastest",
     };
 
-    const response = await axios.post('/orders.json', newOrder);
+    const response = await axios.post("/orders.json", newOrder);
 
     console.log({ response });
 
     this.setState({ loading: false, purchasing: false });
 
-    // } catch (err) {
-    //  this.setState({ loading: false, purchasing: false });
+    const queryParams = [];
 
-    // console.log({ err });
-    // }
+    Object.keys(this.state.ingredients).forEach((ingredient) => {
+      queryParams.push(
+        `${encodeURIComponent(ingredient)}=${encodeURIComponent(
+          this.state.ingredients[ingredient]
+        )}`
+      );
+    });
+
+    const queryString = queryParams.join("&");
+
+    this.props.history.push({
+      pathname: "/checkout",
+      search: "?" + queryString,
+    });
   };
 
   render() {
@@ -114,7 +126,6 @@ class BurgerBuilder extends Component {
     for (let ingredient in disabledInfo)
       disabledInfo[ingredient] = disabledInfo[ingredient] <= 0;
 
-    console.log(this.state);
     return (
       <Aux>
         <Modal
@@ -147,6 +158,8 @@ class BurgerBuilder extends Component {
               ordered={this.purchaseHandler}
             />
           </Aux>
+        ) : this.state.error ? (
+          <p>Ingreidents can't be loaded</p>
         ) : (
           <Spinner />
         )}
