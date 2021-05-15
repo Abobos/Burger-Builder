@@ -72,7 +72,7 @@ class BurgerBuilder extends Component {
   };
 
   purchaseHandler = () => {
-    this.setState({ purchasing: true });
+    this.setState({ purchasing: !this.state.purchasing });
   };
 
   continuePurchase = async () => {
