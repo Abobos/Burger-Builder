@@ -6,7 +6,8 @@ import Button from "../../../components/UI/Button/Button";
 import axios from "../../../axios-orders";
 import Spinner from "../../../components/UI/Spinner/Spinner";
 import Input from "../../../components/UI/Input/Input";
-// import WithErrorHandler from "../../../hoc/WithErrorHandler/WithErrorHandler";
+import WithErrorHandler from "../../../hoc/WithErrorHandler/WithErrorHandler";
+import { connect } from "react-redux";
 
 class ContactData extends Component {
   state = {
@@ -102,13 +103,13 @@ class ContactData extends Component {
   checkFormValidity = (value, rules, trimmedValue = value.trim()) => {
     let isValid = false;
 
-    rules.required && (isValid = trimmedValue !== "");
+    if (rules.required) isValid = trimmedValue !== "";
 
-    rules.minLength &&
-      (isValid = trimmedValue.length >= rules.minLength && isValid);
+    if (rules.minLength)
+      isValid = trimmedValue.length >= rules.minLength && isValid;
 
-    rules.maxLength &&
-      (isValid = trimmedValue.length <= rules.maxLength && isValid);
+    if (rules.maxLength)
+      isValid = trimmedValue.length <= rules.maxLength && isValid;
 
     return isValid;
   };
@@ -203,4 +204,9 @@ class ContactData extends Component {
   }
 }
 
-export default ContactData;
+const mapStateToProps = (state) => ({
+  ingredients: state.burger.ingredients,
+  price: state.burger.totalPrice,
+});
+
+export default connect(mapStateToProps)(WithErrorHandler(ContactData, axios));
