@@ -29,7 +29,6 @@ const withErrorHandler = (WrappedComponent, axios) => {
     }
 
     closeModal = () => {
-      console.log("close");
       this.setState({ error: null });
     };
 
