@@ -6,8 +6,9 @@ const order = (props) => {
     <span
       style={{
         textTransform: "capitalize",
+        display: "inline-block",
         margin: "0 8px",
-        border: "1px solid gray",
+        border: "1px solid #ccc",
         padding: "5px",
       }}
       key={ingredient}

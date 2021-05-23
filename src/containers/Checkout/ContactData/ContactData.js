@@ -9,6 +9,7 @@ import Spinner from "../../../components/UI/Spinner/Spinner";
 import Input from "../../../components/UI/Input/Input";
 import WithErrorHandler from "../../../hoc/WithErrorHandler/WithErrorHandler";
 import * as actionCreators from "../../../redux/actions/index";
+import { updateObject, checkFormValidity } from "../../../shared/helpers";
 
 class ContactData extends Component {
   state = {
@@ -52,6 +53,7 @@ class ContactData extends Component {
           required: true,
           minLength: 3,
           maxLength: 5,
+          isNumeric: true,
         },
         shouldValidate: true,
         pristine: false,
@@ -80,6 +82,7 @@ class ContactData extends Component {
         value: "",
         validation: {
           required: true,
+          isEmail: true,
         },
         shouldValidate: true,
         pristine: false,
@@ -95,24 +98,11 @@ class ContactData extends Component {
         },
         validation: {},
         value: "fastest",
+        valid: true,
       },
     },
     isFormValid: false,
     loading: false,
-  };
-
-  checkFormValidity = (value, rules, trimmedValue = value.trim()) => {
-    let isValid = false;
-
-    if (rules.required) isValid = trimmedValue !== "";
-
-    if (rules.minLength)
-      isValid = trimmedValue.length >= rules.minLength && isValid;
-
-    if (rules.maxLength)
-      isValid = trimmedValue.length <= rules.maxLength && isValid;
-
-    return isValid;
   };
 
   orderHandler = async (event) => {
@@ -134,40 +124,35 @@ class ContactData extends Component {
       ingredients: { ...this.props.ingredients },
       price: +this.props.price,
       orderData: formData,
+      userId: this.props.userId,
     };
 
-    this.props.orderBurger(newOrder);
+    this.props.orderBurger(newOrder, this.props.token);
   };
 
   inputChangedHandler = (event, formElementKey) => {
-    const orderFormElement = JSON.parse(JSON.stringify(this.state.orderForm));
-    const formElementDetails = orderFormElement[formElementKey];
+    let orderFormElement = JSON.parse(JSON.stringify(this.state.orderForm));
+    let formElementDetails = orderFormElement[formElementKey];
 
-    formElementDetails.value = event.target.value;
-    const isValid = this.checkFormValidity(
-      formElementDetails.value,
-      formElementDetails.validation
-    );
+    formElementDetails = updateObject(formElementDetails, {
+      value: event.target.value,
+      valid: checkFormValidity(
+        event.target.value,
+        formElementDetails.validation
+      ),
+      pristine: true,
+    });
 
-    console.log({ orderFormElement });
-    console.log(isValid);
+    orderFormElement = updateObject(orderFormElement, {
+      [formElementKey]: formElementDetails,
+    });
 
-    formElementDetails.valid = isValid;
-    formElementDetails.pristine = true;
+    let formIsValid = true;
 
-    const formELementsForValidation = Object.keys(orderFormElement);
-    console.log({ formELementsForValidation });
-    formELementsForValidation.pop();
+    for (let inputIdentifier in orderFormElement)
+      formIsValid = orderFormElement[inputIdentifier].valid && formIsValid;
 
-    const isFormValid = formELementsForValidation.reduce(
-      (validState, curValue) => {
-        console.log({ curValue }, orderFormElement[curValue].valid, validState);
-        return orderFormElement[curValue].valid && validState;
-      },
-      false
-    );
-
-    this.setState({ orderForm: orderFormElement, isFormValid: true });
+    this.setState({ orderForm: orderFormElement, isFormValid: formIsValid });
   };
 
   render() {
@@ -212,11 +197,13 @@ const mapStateToProps = (state) => ({
   ingredients: state.burger.ingredients,
   price: state.burger.totalPrice,
   orderLoading: state.order.loading,
+  token: state.auth.token,
+  userId: state.auth.userId,
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  orderBurger: (orderData) =>
-    dispatch(actionCreators.purchaseBurger(orderData)),
+  orderBurger: (orderData, token) =>
+    dispatch(actionCreators.purchaseBurger(orderData, token)),
 });
 
 export default connect(

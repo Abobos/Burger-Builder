@@ -16,7 +16,7 @@ const logger = (store) => {
 
 const composeEnhancer = isDevelopment
   ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
-  : compose;
+  : null ?? compose;
 
 const store = createStore(
   reducer,

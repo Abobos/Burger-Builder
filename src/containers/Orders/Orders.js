@@ -9,8 +9,8 @@ import Spinner from "../../components/UI/Spinner/Spinner";
 import * as actionCreators from "../../redux/actions/index";
 
 class Orders extends Component {
-  async componentDidMount() {
-    this.props.fetchOrders();
+  componentDidMount() {
+    this.props.fetchOrders(this.props.token, this.props.userId);
   }
 
   render() {
@@ -36,10 +36,13 @@ class Orders extends Component {
 const mapStateToProps = (state) => ({
   orders: state.order.orders,
   loading: state.order.loading,
+  token: state.auth.token,
+  userId: state.auth.userId,
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  fetchOrders: () => dispatch(actionCreators.fetchOrders()),
+  fetchOrders: (token, userId) =>
+    dispatch(actionCreators.fetchOrders(token, userId)),
 });
 
 export default connect(

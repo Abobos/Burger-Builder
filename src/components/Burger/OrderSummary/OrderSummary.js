@@ -1,18 +1,15 @@
-import React, { Component } from 'react';
+import React, { Component } from "react";
 
-import Aux from '../../../hoc/Aux/Aux';
+import Aux from "../../../hoc/Aux/Aux";
 
-import Button from '../../UI/Button/Button';
+import Button from "../../UI/Button/Button";
 
 class OrderSummary extends Component {
-  componentWillUpdate() {
-    console.log({ updating: 'updating' });
-  }
   render() {
     const ingredientSummary = Object.keys(this.props.ingredients).map(
       (ingredient) => (
         <li key={ingredient}>
-          <span style={{ textTransform: 'capitalize' }}>{ingredient}</span>:{' '}
+          <span style={{ textTransform: "capitalize" }}>{ingredient}</span>:{" "}
           {this.props.ingredients[ingredient]}
         </li>
       )
