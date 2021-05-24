@@ -1,12 +1,7 @@
 import * as actionTypes from "./actionTypes";
 import axios from "axios";
 
-import dotenv from "dotenv";
-
-dotenv.config();
-
-const API_KEY =
-  process.env.API_KEY || "AIzaSyAxd6Mgt4tl1ILpIUhVyUk1_wXYOGiVto0";
+const API_KEY = process.env.REACT_APP_API_KEY;
 
 export const authStart = () => ({
   type: actionTypes.AUTH_START,
