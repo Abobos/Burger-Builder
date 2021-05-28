@@ -60,7 +60,7 @@ export const auth = (email, password, isSignUp) => async (dispatch) => {
     localStorage.setItem("userId", response.data.localId);
 
     dispatch(authSuccess(response.data));
-    dispatch(checkTimeout(response.data.expiresIn));
+    dispatch(checkTimeout(response.data?.expiresIn));
   } catch (err) {
     dispatch(authFailed(err.response.data.error));
   }

@@ -1,22 +1,17 @@
-import React, { Component } from "react";
+import React, { useEffect, useState } from "react";
+import Spinner from "../../components/UI/Spinner/Spinner";
 
 const asyncComponent = (importComponent) => {
-  return class extends Component {
-    state = {
-      component: null,
-    };
+  return (props) => {
+    const [Component, SetComponent] = useState(null);
 
-    componentDidMount() {
+    useEffect(() => {
       importComponent().then((cmp) => {
-        this.setState({ component: cmp.default });
+        SetComponent(cmp.default);
       });
-    }
+    }, []);
 
-    render() {
-      const C = this.state.component;
-
-      return C ? <C {...this.props} /> : null;
-    }
+    return Component ? <Component {...props} /> : <Spinner />;
   };
 };
 

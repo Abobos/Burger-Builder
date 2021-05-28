@@ -19,11 +19,13 @@ const addIngredientHelper = (state, action) => {
   const updatedIngredients = updateObject(state.ingredients, {
     [action.ingredientName]: state.ingredients[action.ingredientName] + 1,
   });
+
   const updatedState = {
     ingredients: updatedIngredients,
     totalPrice: state.totalPrice + INGREDIENTS_PRICES[action.ingredientName],
     building: true,
   };
+
   return updateObject(state, updatedState);
 };
 
@@ -31,11 +33,13 @@ const removeIngredientHelper = (state, action) => {
   const updatedIngredients = updateObject(state.ingredients, {
     [action.ingredientName]: state.ingredients[action.ingredientName] - 1,
   });
+
   const updatedState = {
     ingredients: updatedIngredients,
     totalPrice: state.totalPrice - INGREDIENTS_PRICES[action.ingredientName],
     building: true,
   };
+
   return updateObject(state, updatedState);
 };
 
@@ -53,6 +57,7 @@ const setIngredientHelper = (state, action) => {
     error: false,
     building: false,
   };
+
   return updateObject(state, updatedState);
 };
 
